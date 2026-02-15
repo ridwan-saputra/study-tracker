@@ -7,6 +7,72 @@
     <link rel="stylesheet" href="css/styles.css" />
   </head>
   <body>
+    <div class="layout">
+      <div class="navbar">
+        <h3>Study Tracker</h3>
+      </div>
+      <div class="container">
+        <div class="button-top">
+          <label id="status" for="">Standby</label>
+          <button id="btn-history" popovertarget="popover-history">
+            History
+          </button>
+          <button id="btn-save-menu" popovertarget="popover-save">Save</button>
+        </div>
+        <div id="timer-study">00:00:00</div>
+        <div id="timer-rest">00:00:00</div>
+        <div class="button-bottom">
+          <button id="btn-start">Start</button>
+          <button id="btn-pause">Pause</button>
+          <button id="btn-reset">Reset</button>
+        </div>
+      </div>
+      <div id="popover-save" popover>
+        <div class="navbar-popover-save">
+          <button popovertarget="popover-save" popovertargetaction="hide">
+            X
+          </button>
+          <h3>POPOVER SAVE</h3>
+        </div>
+        <table class="display-session-data">
+          <thead>
+            <th>No</th>
+            <th>Date</th>
+            <th>Start Study</th>
+            <th>End Study</th>
+            <th>Study Time</th>
+            <th>Rest Time</th>
+            <th>Topic</th>
+            <th>X</th>
+          </thead>
+          <tbody id="row-session-data"></tbody>
+        </table>
+      </div>
+      <div id="popover-history" popover>
+        <div class="navbar-popover-history">
+          <button popovertarget="popover-history" popovertargetaction="hide">
+            X
+          </button>
+          <h3>POPOVER HISTORY</h3>
+        </div>
+        <table class="table-history">
+          <thead>
+            <th>No</th>
+            <th>Date</th>
+            <th>Start Study</th>
+            <th>End Study</th>
+            <th>Study Time</th>
+            <th>Rest Time</th>
+            <th>Topic</th>
+            <th>X</th>
+          </thead>
+          <tbody id="row-data-history"></tbody>
+        </table>
+      </div>
+      <div class="footer">
+        <h3>Ridwan Saputra</h3>
+      </div>
+    </div>
     <script src="js/main.js"></script>
   </body>
 </html>
