@@ -13,15 +13,17 @@
       </div>
       <div class="container">
         <div class="button-top">
-          <label id="status" for="">Standby</label>
+          <label id="lbl-status" for="">Standby</label>
           <button id="btn-history" popovertarget="popover-history">
             History
           </button>
-          <button id="btn-save-menu" popovertarget="popover-save">Save</button>
+          <button id="btn-save-menu" popovertarget="popover-save">
+            Save Menu
+          </button>
         </div>
         <hr />
-        <div id="timer-study">00:00:00</div>
-        <div id="timer-rest">00:00:00</div>
+        <div id="stopwatch-study">00:00:00</div>
+        <div id="stopwatch-rest">00:00:00</div>
         <div class="button-bottom">
           <button id="btn-start">Start</button>
           <button id="btn-pause">Pause</button>
@@ -44,10 +46,10 @@
             <th>Study Time</th>
             <th>Rest Time</th>
             <th>Topic</th>
-            <th>X</th>
           </thead>
-          <tbody id="row-session-data"></tbody>
+          <tbody id="tbody-session"></tbody>
         </table>
+        <button id="btn-save-confirm">Save</button>
       </div>
       <div id="popover-history" popover>
         <div class="navbar-popover-history">
@@ -67,13 +69,13 @@
             <th>Topic</th>
             <th>X</th>
           </thead>
-          <tbody id="row-data-history"></tbody>
+          <tbody id="tbody-history"></tbody>
         </table>
       </div>
       <div class="footer">
         <h3>Ridwan Saputra</h3>
       </div>
     </div>
-    <script src="js/main.js"></script>
+    <script src="js/app.js"></script>
   </body>
 </html>
