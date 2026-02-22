@@ -86,9 +86,10 @@ function startStudy() {
   state.lastTickTime = now;
   ui.lblStatus.textContent = "Studying";
 
-  if (state.intervalId === null) {
-    state.intervalId = setInterval(updateUI, 200);
+  if (!state.intervalId) {
+    state.intervalId = setInterval(updateUI, 1000);
   }
+  updateUI();
 }
 
 // Pause belajar (Mulai istirahat)
@@ -102,6 +103,7 @@ function pauseStudy() {
   state.mode = "rest";
   state.lastTickTime = now;
   ui.lblStatus.textContent = "Resting";
+  updateUI();
 }
 
 // Reset semua state ke awal
@@ -110,26 +112,138 @@ function resetStopwatch() {
   state.intervalId = null;
   state.mode = "standby";
   state.sessionStartTime = null;
+  state.lastTickTime = null;
   state.studyAccumulated = 0;
   state.restAccumulated = 0;
 
-  ui.lblStatus.textContent = "Study Tracker";
-  updateUI();
+  ui.lblStatus.textContent = "Standby";
+  updateUI(); // Mengembalikan angka UI ke 00:00:00
 }
 
 // --- RENDER & DATA MANAGEMENT ---
 
 // Menampilkan data sesi saat ini di dalam Popover Save Menu
-function renderSaveMenu() {}
+function renderSaveMenu() {
+  if (state.mode === "standby") {
+    ui.tbodySession.innerHTML = `<tr><td colspan="6" style="text-align:center;">Belum ada sesi dimulai</td></tr>`;
+    return;
+  }
+
+  const now = Date.now();
+  let finalStudy = state.studyAccumulated;
+  let finalRest = state.restAccumulated;
+
+  if (state.mode === "study") finalStudy += now - state.lastTickTime;
+  if (state.mode === "rest") finalRest += now - state.lastTickTime;
+
+  const date = new Date(state.sessionStartTime).toISOString().split("T")[0];
+  const startTimeStudy = new Date(state.sessionStartTime).toLocaleTimeString(
+    [],
+    {
+      hour: "2-digit",
+      minute: "2-digit",
+    },
+  );
+  const endTimeStudy = new Date().toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  const netStudyTime = formatTime(finalStudy);
+  const netRestTime = formatTime(finalRest);
+  const topic = state.topic;
+
+  ui.tbodySession.innerHTML = `
+    <tr>
+      <td>${date}</td>
+      <td>${startTimeStudy}</td>
+      <td>${endTimeStudy}</td>
+      <td>${netStudyTime}</td>
+      <td>${netRestTime}</td>
+      <td>${topic}</td>
+    </tr>
+  `;
+}
 
 // Eksekusi penyimpanan data ke Local Storage
-function saveToHistory() {}
+function saveToHistory() {
+  if (state.mode === "standby") {
+    alert("Mulai belajar terlebih dahulu sebelum menyimpan!");
+    return;
+  }
+
+  const now = Date.now();
+  let finalStudy = state.studyAccumulated;
+  let finalRest = state.restAccumulated;
+
+  if (state.mode === "study") finalStudy += now - state.lastTickTime;
+  if (state.mode === "rest") finalRest += now - state.lastTickTime;
+
+  const sessionData = {
+    id: crypto.randomUUID(),
+    topic: state.topic,
+    createdAt: new Date(state.sessionStartTime).toISOString(),
+    endedAt: new Date().toISOString(),
+    duration: {
+      study: finalStudy, // dalam millisecond
+      rest: finalRest,
+    },
+  };
+
+  const history = getHistoryData();
+  history.push(sessionData);
+  saveHistoryData(history);
+
+  resetStopwatch();
+
+  // Menutup popover setelah save (API Popover HTML5)
+  document.getElementById("popover-save").hidePopover();
+
+  renderHistory();
+  alert("Data berhasil disimpan!");
+}
 
 // Menampilkan semua history yang tersimpan
-function renderHistory() {}
+function renderHistory() {
+  const history = getHistoryData();
+  ui.tbodyHistory.innerHTML = "";
+
+  if (history.length === 0) {
+    ui.tbodyHistory.innerHTML = `<tr><td colspan="8" style="text-align:center;">Belum ada data history</td></tr>`;
+    return;
+  }
+
+  history.forEach((session, index) => {
+    const no = index + 1;
+    const rawDate = session.createdAt;
+    const date = rawDate.split("T")[0];
+    const startTimeStudy = new Date(session.createdAt).toLocaleTimeString();
+    const endTimeStudy = new Date(session.endedAt).toLocaleTimeString();
+    const netStudyTime = formatTime(session.duration.study);
+    const netRestTime = formatTime(session.duration.rest);
+    const topic = session.topic;
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${no}</td>
+      <td>${date}</td>
+      <td>${startTimeStudy}</td>
+      <td>${endTimeStudy}</td>
+      <td>${netStudyTime}</td>
+      <td>${netRestTime}</td>
+      <td>${topic}</td>
+      <td><button class="btn-delete" data-id="${session.id}">X</button></td>
+    `;
+    ui.tbodyHistory.appendChild(tr);
+  });
+}
 
 // Menghapus spesifik baris di history
-function deleteHistory(id) {}
+function deleteHistory(id) {
+  let history = getHistoryData();
+  history = history.filter((session) => session.id !== id); // Buang data yang ID-nya cocok
+  saveHistoryData(history);
+  renderHistory();
+}
 
 // --- EVENT LISTENERS ---
 
@@ -144,7 +258,7 @@ ui.btnHistory.addEventListener("click", renderHistory);
 // Event Delegation untuk tombol delete di tabel yang di-render dinamis
 ui.tbodyHistory.addEventListener("click", (e) => {
   if (e.target.classList.contains("btn-delete")) {
-    const id = parseInt(e.target.getAttribute("data-id"));
+    const id = e.target.getAttribute("data-id");
     if (confirm("Yakin ingin menghapus history ini?")) {
       deleteHistory(id);
     }

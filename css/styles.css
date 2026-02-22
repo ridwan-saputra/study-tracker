@@ -123,19 +123,14 @@ hr {
   height: 40px;
 }
 
-#popover-history {
-  position: absolute;
-  top: 40px;
-  left: 50%;
-  transform: translate(-50%, 0%);
-}
-
+#popover-history,
 #popover-save {
   position: absolute;
-  position: absolute;
   top: 40px;
   left: 50%;
   transform: translate(-50%, 0%);
+  max-width: 476px;
+  overflow: scroll;
 }
 
 .navbar-popover-save,
@@ -177,4 +172,11 @@ tbody tr:nth-child(even) {
 
 tbody tr:hover {
   background-color: #e0f7f4;
+}
+
+#btn-save-confirm {
+  display: flex;
+  justify-self: center;
+  padding: 5px;
+  margin-top: 10px;
 }
